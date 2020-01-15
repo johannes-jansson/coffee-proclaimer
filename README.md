@@ -23,6 +23,7 @@ This is all implemented with a non-invasive current probed clamped around the
 cable to the coffee maker. This is hooked up to a wifi-connected
 microcontroller, which will post to the Slack API using webhooks. 
 
+
 ## Parts list
 
 - Particle photon
@@ -31,3 +32,9 @@ microcontroller, which will post to the Slack API using webhooks.
 - Resistor
 - (Encasing)
 - (Power supply)
+
+
+## Future improvements
+
+- By measuring the time spent in the "high current draw zone", we could
+  calculate how many cups are being brewed. 
