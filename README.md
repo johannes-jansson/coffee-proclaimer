@@ -29,10 +29,38 @@ microcontroller, which will post to the Slack API using webhooks.
 - Particle photon
 - Non-invasive current probe (https://www.electrokit.com/produkt/stromprob-30a/)
 - 3.5mm jack
-- Resistor
+- Resistor (357 ohms for a 2000 W coffee maker, calculations below)
 - (Encasing)
 - (Power supply)
 
+
+## Math
+
+The current probe measures up to 30 A, which yields a current of 15 mA. As an
+example they provided that a 10 ohm resistor provides a measurable voltage of
+5 mV/A. 
+
+The microprocessor measures voltage from 0 to 3.3 v in 4096 steps. 
+
+The moccamaster I googled runs on 1400 W, 13 A. 
+
+Since U = R * I, their example becomes:
+
+```
+30 A in the big cable => 15 mA in the small cable
+1 A in the big cable => 0.5 mA in the big cable
+10 Ohm * 0.5 mA = 5 mV
+```
+
+which checks out 👌
+
+For our use case, let's make sure we can tolerate 2000 W, 18.5 A, in
+the big cable. This corresponds to 9.25 mA in the small cablle. The
+calculations for the resistor value becomes:
+
+```
+R = U / I = 3300 mV / 9.25 mA ≈ 357 Ohms
+```
 
 ## Future improvements
 
