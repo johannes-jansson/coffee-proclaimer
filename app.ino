@@ -6,6 +6,7 @@
 #define UPPER_TRESHOLD 3000
 #define MIDDLE_TRESHOLD 1000
 #define LOWER_TRESHOLD 500
+#define THINGSPEAK HIGH
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
@@ -20,22 +21,26 @@ void setup() {
   WiFi.setCredentials("SSID", "password");
   Particle.connect();
 
-  Particle.function("read", read);
-  Particle.function("started", read);
-  Particle.function("done", read);
-  Particle.function("finished", read);
+  Particle.function("read", readVoltage);
+  Particle.function("started", started);
+  Particle.function("done", done);
+  Particle.function("finished", finished);
   /* Particle.variable("reading", reading) */
+  digitalWrite(LED_PIN, HIGH);
 }
 
 void loop() {
   int reading = readMany("");
+  if (THINGSPEAK) {
+    Particle.publish("tsReading", String(reading));
+  }
 
   // waiting for it to start
   if (state == 0 && reading > UPPER_TRESHOLD) {
     // Boiling has started! Do nothing
     state = 1;
     started("");
-    break;
+    return;
   }
 
   // waiting for it to finish boiling
@@ -45,7 +50,7 @@ void loop() {
 
     // TODO: maybe add some kind of delay here
     done("");
-    break;
+    return;
   }
 
   // waiting for it to finish boiling
@@ -53,7 +58,7 @@ void loop() {
     // The coffee brewer was turned off, no more coffee
     state = 0;
     finished("");
-    break;
+    return;
   }
 
   delay(LOOP_DELAY);
@@ -64,28 +69,34 @@ int readMany(String command) {
   int reading = 0;
   int newReading = 0;
   for (int i = 0; i < NBR_OF_READINGS; i++) {
-    newReading = read("");
+    newReading = readVoltage("");
     reading = reading + newReading;
     delay(READING_DELAY);
   }
   return reading / NBR_OF_READINGS;
 }
 
-int read(String command) {
-  return analogRead(LED_PIN);
+int readVoltage(String command) {
+  return analogRead(READ_PIN);
 }
 
-void started(String command) {
-  Particle.publish("started");
-  return;
+int started(String command) {
+  if (THINGSPEAK) {
+    Particle.publish("tsStarted", "1", PRIVATE);
+  }
+  return 1;
 }
 
-void done(String command) {
-  Particle.publish("done");
-  return;
+int done(String command) {
+  if (THINGSPEAK) {
+    Particle.publish("tsDone", "1", PRIVATE);
+  }
+  return 1;
 }
 
-void finished(String command) {
-  Particle.publish("finished");
-  return;
+int finished(String command) {
+  if (THINGSPEAK) {
+    Particle.publish("tsFinished", "1", PRIVATE);
+  }
+  return 1;
 }
