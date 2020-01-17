@@ -11,13 +11,18 @@
 #define MIDDLE_TRESHOLD 500
 #define LOWER_TRESHOLD 50
 
+#define AUTO_TURNOFF_TIME 30 * 60 * 1000
+
 #define THINGSPEAK HIGH
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
 int state = 0;
 int positiveReadings[NBR_OF_READINGS];
-int maxReading = -1;
+int maxReading;
+unsigned long = timer;
+int = elapsed;
+
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -29,9 +34,6 @@ void setup() {
   /* WiFi.setCredentials("insert-SSID-here", "insert-password-here"); */
   Particle.connect();
 
-  Particle.function("started", started);
-  Particle.function("done", done);
-  Particle.function("finished", finished);
   Particle.variable("max", maxReading);
 }
 
@@ -45,7 +47,8 @@ void loop() {
   if (state == 0 && reading > UPPER_TRESHOLD) {
     // Boiling has started! Do nothing
     state = 1;
-    started("");
+    timer = millis();
+    started();
     return;
   }
 
@@ -53,23 +56,30 @@ void loop() {
   if (state == 1 && reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD) {
     // Boiling is done, so coffee is (almost) done
     state = 2;
+    elapsed = millis() - timer;
 
-    // TODO: how many cups? based on time
+    // TODO: how many cups? based on time stored in elapse
     // TODO: maybe add some kind of delay here
-    done("");
+    done();
     return;
   }
 
   // see if heat pad is turned off yet
-  if ((state == 1  || state == 2) && reading < LOWER_TRESHOLD) {
+  if (state != 0 && reading < LOWER_TRESHOLD) {
     // The coffee brewer was turned off, no more coffee
-    state = 0;
+    elapsed = millis() - timer;
+    timer = millis();
 
-    // TODO: was it turned off manually or automatically? based on time
-    finished("");
+    // was it turned off manually or automatically? based on time
+    if (elapsed =< AUTO_TURNOFF_TIME) {
+      finished(false);
+    } else {
+      finished(true);
+    }
     return;
   }
-delay(LOOP_DELAY);
+
+  delay(LOOP_DELAY);
 }
 
 // Do NBR_OF_READINGS readings, return RMS value
@@ -104,23 +114,21 @@ int readMany(String command) {
 
 /* event handlers -------------------- */
 
-int started(String command) {
-  if (THINGSPEAK) {
-    Particle.publish("started", "Coffee is on it's way! Sit tight! :rocket:", PUBLIC);
-  }
+void started() {
+  Particle.publish("started", "Coffee is on it's way! Sit tight! :rocket:", PUBLIC);
+  return;
+}
+
+void done() {
+  Particle.publish("done", "Coffee is served! :coffee:", PUBLIC);
   return 1;
 }
 
-int done(String command) {
-  if (THINGSPEAK) {
-    Particle.publish("done", "Coffee is served! :coffee:", PUBLIC);
-  }
-  return 1;
-}
-
-int finished(String command) {
-  if (THINGSPEAK) {
+void finished(bool timeout) {
+  if (timeout) {
     Particle.publish("finished", "The coffee is getting cold, hurry! :snowflake:", PUBLIC);
+  } else {
+    Particle.publish("finished", "No more coffee :frowning:", PUBLIC);
   }
-  return 1;
+  return;
 }
