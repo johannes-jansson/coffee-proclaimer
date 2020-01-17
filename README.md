@@ -29,7 +29,9 @@ microcontroller, which will post to the Slack API using webhooks.
 - Particle photon
 - Non-invasive current probe (https://www.electrokit.com/produkt/stromprob-30a/)
 - 3.5mm jack
-- Resistor (357 ohms for a 2000 W coffee maker, calculations below)
+- Shunt resistor (357 ohms for a 2000 W coffee maker, calculations below)
+- Voltage divider resistors
+- Filter capacitor
 - (Encasing)
 - (Power supply)
 
@@ -69,3 +71,7 @@ R = U / I = 3300 mV / 9.25 mA ≈ 357 Ohms
 - By measuring the time from start to stop, we could determine if the
   coffee maker was automatically turned off (there is still coffee!) or
   if somebody turned it off ahead of time (there is no more coffee). 
+
+## Creds
+
+* David Cervantes Caballero, [for his implementation of subtracting virtual ground and calculating RMS](https://scidle.com/how-to-use-non-invasive-ac-current-sensors-with-arduino/).
