@@ -17,6 +17,7 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 
 int state = 0;
 int positiveReadings[NBR_OF_READINGS];
+int maxReading = -1;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -31,6 +32,7 @@ void setup() {
   Particle.function("started", started);
   Particle.function("done", done);
   Particle.function("finished", finished);
+  Particle.variable("max", maxReading);
 }
 
 void loop() {
@@ -79,9 +81,13 @@ int readMany(String command) {
     delay(READING_DELAY);
   }
 
-  // calculate root mean squared value
+  // Calculate root mean squared value 📈
+  // Also store the maximum value, used for fine tuning shunt resistor value
   float sumSquared = 0;
   for (int i = 0; i < NBR_OF_READINGS; i++) {
+    if (positiveReadings[i] > maxReading) {
+      maxReading = positiveReadings[i];
+    }
     sumSquared = sumSquared + pow(positiveReadings[i], 2);
   }
 
