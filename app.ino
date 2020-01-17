@@ -7,9 +7,9 @@
 #define READING_DELAY 1
 #define LOOP_DELAY 4000
 
-#define UPPER_TRESHOLD 3000
-#define MIDDLE_TRESHOLD 1000
-#define LOWER_TRESHOLD 500
+#define UPPER_TRESHOLD 1000
+#define MIDDLE_TRESHOLD 500
+#define LOWER_TRESHOLD 50
 
 #define THINGSPEAK HIGH
 
@@ -41,36 +41,38 @@ void loop() {
     Particle.publish("tsReading", String(reading));
   }
 
-  /* // waiting for it to start */
-  /* if (state == 0 && reading > UPPER_TRESHOLD) { */
-  /*   // Boiling has started! Do nothing */
-  /*   state = 1; */
-  /*   started(""); */
-  /*   return; */
-  /* } */
+  // see if it started yet
+  if (state == 0 && reading > UPPER_TRESHOLD) {
+    // Boiling has started! Do nothing
+    state = 1;
+    started("");
+    return;
+  }
 
-  /* // waiting for it to finish boiling */
-  /* if (state == 1 && reading < MIDDLE_TRESHOLD) { */
-  /*   // Boiling is done, so coffee is (almost) done */
-  /*   state = 2; */
+  // see if it finished boiling
+  if (state == 1 && reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD) {
+    // Boiling is done, so coffee is (almost) done
+    state = 2;
 
-  /*   // TODO: maybe add some kind of delay here */
-  /*   done(""); */
-  /*   return; */
-  /* } */
+    // TODO: how many cups? based on time
+    // TODO: maybe add some kind of delay here
+    done("");
+    return;
+  }
 
-  /* // waiting for it to finish boiling */
-  /* if (state == 2 && reading < LOWER_TRESHOLD) { */
-  /*   // The coffee brewer was turned off, no more coffee */
-  /*   state = 0; */
-  /*   finished(""); */
-  /*   return; */
-  /* } */
+  // see if heat pad is turned off yet
+  if ((state == 1  || state == 2) && reading < LOWER_TRESHOLD) {
+    // The coffee brewer was turned off, no more coffee
+    state = 0;
 
-  delay(LOOP_DELAY);
+    // TODO: was it turned off manually or automatically? based on time
+    finished("");
+    return;
+  }
+delay(LOOP_DELAY);
 }
 
-// Do NBR_OF_READINGS readings, return RMS
+// Do NBR_OF_READINGS readings, return RMS value
 int readMany(String command) {
   digitalWrite(LED_PIN, HIGH);
 
@@ -104,21 +106,21 @@ int readMany(String command) {
 
 int started(String command) {
   if (THINGSPEAK) {
-    Particle.publish("tsStarted", "1", PUBLIC);
+    Particle.publish("started", "Coffee is on it's way! Sit tight! :rocket:", PUBLIC);
   }
   return 1;
 }
 
 int done(String command) {
   if (THINGSPEAK) {
-    Particle.publish("tsDone", "1", PUBLIC);
+    Particle.publish("done", "Coffee is served! :coffee:", PUBLIC);
   }
   return 1;
 }
 
 int finished(String command) {
   if (THINGSPEAK) {
-    Particle.publish("tsFinished", "1", PUBLIC);
+    Particle.publish("finished", "The coffee is getting cold, hurry! :snowflake:", PUBLIC);
   }
   return 1;
 }
