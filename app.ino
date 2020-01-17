@@ -1,8 +1,8 @@
 #define READ_PIN A0
 #define LED_PIN D7
-#define NBR_OF_READINGS 3
-#define READING_DELAY 100
-#define LOOP_DELAY 5000
+#define NBR_OF_READINGS 100
+#define READING_DELAY 10
+#define LOOP_DELAY 1000
 #define UPPER_TRESHOLD 3000
 #define MIDDLE_TRESHOLD 1000
 #define LOWER_TRESHOLD 500
@@ -26,40 +26,44 @@ void setup() {
   Particle.function("done", done);
   Particle.function("finished", finished);
   /* Particle.variable("reading", reading) */
+
+  Serial.begin();
+
   digitalWrite(LED_PIN, HIGH);
 }
 
 void loop() {
   int reading = readMany("");
+  Serial.println(reading);
   if (THINGSPEAK) {
     Particle.publish("tsReading", String(reading));
   }
 
-  // waiting for it to start
-  if (state == 0 && reading > UPPER_TRESHOLD) {
-    // Boiling has started! Do nothing
-    state = 1;
-    started("");
-    return;
-  }
+  /* // waiting for it to start */
+  /* if (state == 0 && reading > UPPER_TRESHOLD) { */
+  /*   // Boiling has started! Do nothing */
+  /*   state = 1; */
+  /*   started(""); */
+  /*   return; */
+  /* } */
 
-  // waiting for it to finish boiling
-  if (state == 1 && reading < MIDDLE_TRESHOLD) {
-    // Boiling is done, so coffee is (almost) done
-    state = 2;
+  /* // waiting for it to finish boiling */
+  /* if (state == 1 && reading < MIDDLE_TRESHOLD) { */
+  /*   // Boiling is done, so coffee is (almost) done */
+  /*   state = 2; */
 
-    // TODO: maybe add some kind of delay here
-    done("");
-    return;
-  }
+  /*   // TODO: maybe add some kind of delay here */
+  /*   done(""); */
+  /*   return; */
+  /* } */
 
-  // waiting for it to finish boiling
-  if (state == 2 && reading < LOWER_TRESHOLD) {
-    // The coffee brewer was turned off, no more coffee
-    state = 0;
-    finished("");
-    return;
-  }
+  /* // waiting for it to finish boiling */
+  /* if (state == 2 && reading < LOWER_TRESHOLD) { */
+  /*   // The coffee brewer was turned off, no more coffee */
+  /*   state = 0; */
+  /*   finished(""); */
+  /*   return; */
+  /* } */
 
   delay(LOOP_DELAY);
 }
