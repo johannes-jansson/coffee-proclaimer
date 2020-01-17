@@ -73,6 +73,8 @@ R = U / I = 3300 mV / 9.25 mA ≈ 357 Ohms
   if somebody turned it off ahead of time (there is no more coffee).
 - [ ] Device should restart every night, to keep timers sane and re-sync time.
 - [ ] Make messages more dynamic using random, time and date. 
+- [ ] Handle odd state transitions (turning on the heat pad again, cancelling
+  during boiling, etc).
 
 ## Creds
 
