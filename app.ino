@@ -1,40 +1,40 @@
+#include "math.h"
 #define READ_PIN A0
+#define GROUND_PIN A1
 #define LED_PIN D7
-#define NBR_OF_READINGS 100
-#define READING_DELAY 10
-#define LOOP_DELAY 1000
+
+#define NBR_OF_READINGS 500
+#define READING_DELAY 1
+#define LOOP_DELAY 4000
+
 #define UPPER_TRESHOLD 3000
 #define MIDDLE_TRESHOLD 1000
 #define LOWER_TRESHOLD 500
+
 #define THINGSPEAK HIGH
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
 int state = 0;
+int positiveReadings[NBR_OF_READINGS];
 
 void setup() {
   pinMode(READ_PIN, INPUT);
+  pinMode(GROUND_PIN, INPUT);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
   WiFi.on();
-  WiFi.setCredentials("SSID", "password");
+  /* WiFi.setCredentials("insert-SSID-here", "insert-password-here"); */
   Particle.connect();
 
-  Particle.function("read", readVoltage);
   Particle.function("started", started);
   Particle.function("done", done);
   Particle.function("finished", finished);
-  /* Particle.variable("reading", reading) */
-
-  Serial.begin();
-
-  digitalWrite(LED_PIN, HIGH);
 }
 
 void loop() {
   int reading = readMany("");
-  Serial.println(reading);
   if (THINGSPEAK) {
     Particle.publish("tsReading", String(reading));
   }
@@ -68,39 +68,51 @@ void loop() {
   delay(LOOP_DELAY);
 }
 
-// Do three readings, take some kind of average
+// Do NBR_OF_READINGS readings, return RMS
 int readMany(String command) {
-  int reading = 0;
-  int newReading = 0;
+  digitalWrite(LED_PIN, HIGH);
+
+  // make reads as ints and store them away because it's fast ⚡️
+  // subtract virtual ground to keep things smooth and accurate 😎
   for (int i = 0; i < NBR_OF_READINGS; i++) {
-    newReading = readVoltage("");
-    reading = reading + newReading;
+    positiveReadings[i] = analogRead(READ_PIN) - analogRead(GROUND_PIN);
     delay(READING_DELAY);
   }
-  return reading / NBR_OF_READINGS;
+
+  // calculate root mean squared value
+  float sumSquared = 0;
+  for (int i = 0; i < NBR_OF_READINGS; i++) {
+    sumSquared = sumSquared + pow(positiveReadings[i], 2);
+  }
+
+  // cast it as an int because it's convenient to handle in the particle cloud,
+  // and because it feels cheesy to store int readings in a float just because
+  // we did some fancy math on it 🧀
+  int rms = sqrt(sumSquared / NBR_OF_READINGS);
+
+  digitalWrite(LED_PIN, LOW);
+  return rms;
 }
 
-int readVoltage(String command) {
-  return analogRead(READ_PIN);
-}
+/* event handlers -------------------- */
 
 int started(String command) {
   if (THINGSPEAK) {
-    Particle.publish("tsStarted", "1", PRIVATE);
+    Particle.publish("tsStarted", "1", PUBLIC);
   }
   return 1;
 }
 
 int done(String command) {
   if (THINGSPEAK) {
-    Particle.publish("tsDone", "1", PRIVATE);
+    Particle.publish("tsDone", "1", PUBLIC);
   }
   return 1;
 }
 
 int finished(String command) {
   if (THINGSPEAK) {
-    Particle.publish("tsFinished", "1", PRIVATE);
+    Particle.publish("tsFinished", "1", PUBLIC);
   }
   return 1;
 }
