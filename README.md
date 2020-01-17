@@ -65,4 +65,7 @@ R = U / I = 3300 mV / 9.25 mA ≈ 357 Ohms
 ## Future improvements
 
 - By measuring the time spent in the "high current draw zone", we could
-  calculate how many cups are being brewed. 
+  calculate how many cups are being brewed.
+- By measuring the time from start to stop, we could determine if the
+  coffee maker was automatically turned off (there is still coffee!) or
+  if somebody turned it off ahead of time (there is no more coffee). 
