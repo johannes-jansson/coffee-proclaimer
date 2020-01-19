@@ -20,8 +20,8 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 int state = 0;
 int positiveReadings[NBR_OF_READINGS];
 int maxReading;
-unsigned long = timer;
-int = elapsed;
+unsigned long timer;
+int elapsed;
 
 
 void setup() {
@@ -31,7 +31,7 @@ void setup() {
   digitalWrite(LED_PIN, LOW);
 
   WiFi.on();
-  /* WiFi.setCredentials("insert-SSID-here", "insert-password-here"); */
+  /* WiFi.setCredentials("ssid", "password"); */
   Particle.connect();
 
   Particle.variable("max", maxReading);
@@ -71,7 +71,7 @@ void loop() {
     timer = millis();
 
     // was it turned off manually or automatically? based on time
-    if (elapsed =< AUTO_TURNOFF_TIME) {
+    if (elapsed <= AUTO_TURNOFF_TIME) {
       finished(false);
     } else {
       finished(true);
@@ -121,7 +121,7 @@ void started() {
 
 void done() {
   Particle.publish("done", "Coffee is served! :coffee:", PUBLIC);
-  return 1;
+  return;
 }
 
 void finished(bool timeout) {
