@@ -7,7 +7,7 @@
 #define READING_DELAY 1
 #define LOOP_DELAY 4000
 
-#define UPPER_TRESHOLD 500
+#define UPPER_TRESHOLD 1000
 #define MIDDLE_TRESHOLD 200
 #define LOWER_TRESHOLD 40
 
@@ -67,6 +67,7 @@ void loop() {
   // see if heat pad is turned off yet
   if (state != 0 && reading < LOWER_TRESHOLD) {
     // The coffee brewer was turned off, no more coffee
+    state = 0;
     elapsed = millis() - timer;
     timer = millis();
 
