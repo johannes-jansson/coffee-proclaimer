@@ -12,6 +12,8 @@
 #define LOWER_TRESHOLD 40
 
 #define AUTO_TURNOFF_TIME 29 * 60 * 1000
+#define BOIL_DELAY 300 * 1000
+#define DRIP_DELAY 150 * 1000
 
 #define THINGSPEAK HIGH
 
@@ -22,7 +24,7 @@ int positiveReadings[NBR_OF_READINGS];
 int maxReading;
 unsigned long timer;
 int elapsed;
-
+bool publishedBoilTimer = LOW;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -52,16 +54,21 @@ void loop() {
     return;
   }
 
-  // see if it finished boiling
+  // see if it finished boiling, indlucing drip delay
   if (state == 1 && reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD) {
-    // Boiling is done, so coffee is (almost) done
-    state = 2;
+    // Boiling is done
     elapsed = millis() - timer;
 
-    Particle.publish("tsBoilTimer", String(elapsed), PUBLIC);
-    // TODO: how many cups? based on time stored in elapse
-    // TODO: maybe add some kind of delay here
-    done();
+    if (!publishedBoilTimer) {
+      Particle.publish("tsBoilTimer", String(elapsed), PUBLIC);
+      publishedBoilTimer = HIGH;
+    }
+
+    if (millis() - timer > DRIP_DELAY) {
+      state = 2;
+      // log the elapsed time
+      done(elapsed);
+    }
     return;
   }
 
@@ -69,6 +76,8 @@ void loop() {
   if (state != 0 && reading < LOWER_TRESHOLD) {
     // The coffee brewer was turned off, no more coffee
     state = 0;
+    publishedBoilTimer = LOW;
+
     elapsed = millis() - timer;
     timer = millis();
 
@@ -122,7 +131,8 @@ void started() {
   return;
 }
 
-void done() {
+// TODO: how many cups? based on time in elapsed
+void done(int elapsed) {
   Particle.publish("done", "Coffee is served! :coffee:", PUBLIC);
   return;
 }
