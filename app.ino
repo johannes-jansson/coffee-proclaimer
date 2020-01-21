@@ -9,7 +9,7 @@
 
 #define UPPER_TRESHOLD 1000
 #define MIDDLE_TRESHOLD 200
-#define LOWER_TRESHOLD 40
+#define LOWER_TRESHOLD 30
 
 #define AUTO_TURNOFF_TIME 29 * 60 * 1000
 #define BOIL_DELAY 300 * 1000
@@ -23,8 +23,8 @@ int state = 0;
 int positiveReadings[NBR_OF_READINGS];
 int maxReading;
 unsigned long timer;
+unsigned long boiler_timer;
 int elapsed;
-bool publishedBoilTimer = LOW;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -41,60 +41,50 @@ void setup() {
 
 void loop() {
   int reading = readMany("");
+
   if (THINGSPEAK) {
     Particle.publish("tsReading", String(reading));
   }
 
-  // see if it started yet
+  // check if boiling has started
   if (state == 0 && reading > UPPER_TRESHOLD) {
-    // Boiling has started! Do nothing
     state = 1;
     timer = millis();
     started();
     return;
   }
 
-  // see if it finished boiling, indlucing drip delay
+  // check if boiling has finished and heating has started
   if (state == 1 && reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD) {
-    // Boiling is done
-    elapsed = millis() - timer;
-
-    if (!publishedBoilTimer) {
-      Particle.publish("tsBoilTimer", String(elapsed), PUBLIC);
-      publishedBoilTimer = HIGH;
-    }
-
-    if (millis() - timer > DRIP_DELAY) {
-      state = 2;
-      // log the elapsed time
-      done(elapsed);
-    }
+    state = 2;
+    Particle.publish("tsBoilTimer", String(millis() - timer), PUBLIC);
+    boiler_timer = millis();
     return;
   }
 
-  // see if heat pad is turned off yet
+  // check if the coffee is ready (based on time since boiler done)
+  if (
+    state == 2 &&
+    reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD &&
+    millis() - boiler_timer > DRIP_DELAY
+  ) {
+    state = 3;
+    done(millis() - timer);
+  }
+
+  // check if heat pad is turned off
   if (state != 0 && reading < LOWER_TRESHOLD) {
-    // The coffee brewer was turned off, no more coffee
     state = 0;
-    publishedBoilTimer = LOW;
-
     elapsed = millis() - timer;
-    timer = millis();
-
     Particle.publish("tsHeatTimer", String(elapsed), PUBLIC);
-    // was it turned off manually or automatically? based on time
-    if (elapsed <= AUTO_TURNOFF_TIME) {
-      finished(false);
-    } else {
-      finished(true);
-    }
+    finished(elapsed);
     return;
   }
 
   delay(LOOP_DELAY);
 }
 
-// Do NBR_OF_READINGS readings, return RMS value
+// Do NBR_OF_READINGS readings, return RMS value 🔬
 int readMany(String command) {
   digitalWrite(LED_PIN, HIGH);
 
@@ -137,8 +127,8 @@ void done(int elapsed) {
   return;
 }
 
-void finished(bool timeout) {
-  if (timeout) {
+void finished(int elapsed) {
+  if (elapsed >= AUTO_TURNOFF_TIME) {
     Particle.publish("finished", "The coffee is getting cold, hurry! :snowflake:", PUBLIC);
   } else {
     Particle.publish("finished", "No more coffee :frowning:", PUBLIC);
