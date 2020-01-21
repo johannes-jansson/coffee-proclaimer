@@ -58,6 +58,7 @@ void loop() {
     state = 2;
     elapsed = millis() - timer;
 
+    Particle.publish("tsBoilTimer", String(elapsed), PUBLIC);
     // TODO: how many cups? based on time stored in elapse
     // TODO: maybe add some kind of delay here
     done();
@@ -71,6 +72,7 @@ void loop() {
     elapsed = millis() - timer;
     timer = millis();
 
+    Particle.publish("tsHeatTimer", String(elapsed), PUBLIC);
     // was it turned off manually or automatically? based on time
     if (elapsed <= AUTO_TURNOFF_TIME) {
       finished(false);
