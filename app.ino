@@ -21,7 +21,6 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 
 int state = 0;
 int positiveReadings[NBR_OF_READINGS];
-int maxReading;
 unsigned long timer;
 unsigned long boiler_timer;
 int elapsed;
@@ -35,8 +34,6 @@ void setup() {
   WiFi.on();
   /* WiFi.setCredentials("ssid", "password"); */
   Particle.connect();
-
-  Particle.variable("max", maxReading);
 }
 
 void loop() {
@@ -96,12 +93,8 @@ int readMany(String command) {
   }
 
   // Calculate root mean squared value 📈
-  // Also store the maximum value, used for fine tuning shunt resistor value
   float sumSquared = 0;
   for (int i = 0; i < NBR_OF_READINGS; i++) {
-    if (positiveReadings[i] > maxReading) {
-      maxReading = positiveReadings[i];
-    }
     sumSquared = sumSquared + pow(positiveReadings[i], 2);
   }
 
