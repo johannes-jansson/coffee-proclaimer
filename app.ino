@@ -11,10 +11,10 @@
 #define MIDDLE_TRESHOLD 200
 #define LOWER_TRESHOLD 30
 
-#define K1 28500
-#define M1 0
-#define K2 15000
-#define M2 0
+#define K1 36.5
+#define M1 -500
+#define K2 34000
+#define M2 11600
 
 #define AUTO_TURNOFF_TIME 29 * 60 * 1000
 #define BOIL_DELAY 300 * 1000
@@ -29,6 +29,7 @@ int positiveReadings[NBR_OF_READINGS];
 unsigned long timer;
 unsigned long boiler_timer;
 int elapsed;
+float cups = -1;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -59,8 +60,9 @@ void loop() {
   // check if boiling has finished and heating has started
   if (state == 1 && reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD) {
     state = 2;
-    Particle.publish("tsBoilTimer", String(millis() - timer), PUBLIC);
     boiler_timer = millis();
+    Particle.publish("tsBoilTimer", String(boiler_timer - timer), PUBLIC);
+    cups = (K1 * (boiler_timer - timer) * M1) / 1000.0
     return;
   }
 
@@ -71,8 +73,7 @@ void loop() {
     millis() - boiler_timer > DRIP_DELAY
   ) {
     state = 3;
-    // pass the time it took to boil the water to done
-    done(boiler_timer - timer);
+    done();
   }
 
   // check if heat pad is turned off
@@ -120,11 +121,9 @@ void started() {
   return;
 }
 
-// TODO: how many cups? based on time in elapsed
-void done(int elapsed) {
+void done() {
   Particle.publish("done", "Coffee is served! :coffee:", PUBLIC);
-  float cups = (elapsed - M1) / K1;
-  Particle.publish("cups", String(cups), PUBLIC);
+  Particle.publish("cups", String(round(cups)), PUBLIC);
   return;
 }
 
