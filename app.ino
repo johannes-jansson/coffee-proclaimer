@@ -11,6 +11,11 @@
 #define MIDDLE_TRESHOLD 200
 #define LOWER_TRESHOLD 30
 
+#define K1 28500
+#define M1 0
+#define K2 15000
+#define M2 0
+
 #define AUTO_TURNOFF_TIME 29 * 60 * 1000
 #define BOIL_DELAY 300 * 1000
 #define DRIP_DELAY 150 * 1000
@@ -66,7 +71,8 @@ void loop() {
     millis() - boiler_timer > DRIP_DELAY
   ) {
     state = 3;
-    done(millis() - timer);
+    // pass the time it took to boil the water to done
+    done(boiler_timer - timer);
   }
 
   // check if heat pad is turned off
@@ -117,6 +123,8 @@ void started() {
 // TODO: how many cups? based on time in elapsed
 void done(int elapsed) {
   Particle.publish("done", "Coffee is served! :coffee:", PUBLIC);
+  float cups = (elapsed - M1) / K1;
+  Particle.publish("cups", String(cups), PUBLIC);
   return;
 }
 
