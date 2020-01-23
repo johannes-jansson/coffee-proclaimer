@@ -35,8 +35,9 @@ microcontroller, which will post to the Slack API using webhooks.
 - (Encasing)
 - (Power supply)
 
+![breadboard](breadboard.png)
 
-## Math
+## Electrical math
 
 The current probe measures up to 30 A, which yields a current of 15 mA. As an
 example they provided that a 10 ohm resistor provides a measurable voltage of
@@ -64,10 +65,29 @@ calculations for the resistor value becomes:
 R = U / I = 3300 mV / 9.25 mA ≈ 357 Ohms
 ```
 
+
+## Modeling math
+
+We will assume a linear model for the amount of coffee X that is boiled in
+time Y: `Y = k1 * X + m1`. Then another one for the amount of time Y it takes
+for X cups of coffee to drip through the filter, after the boiling is
+completed: `Y = k2 * X + m1`. Based on 4 measurements on our Moccamaster, we
+end up with:
+
+```
+k1 = 36.5
+m1 = -500
+k2 = 34000
+m2 = 11600
+```
+
+
 ## Future improvements
 
 - [x] Introduce a delay after "finished" boiling, to let the coffee run down.
-- [ ] By measuring the time spent in the "high current draw zone", we could
+- [ ] Based on number of cups, we should calculate how long the delay above
+  will be. 
+- [x] By measuring the time spent in the "high current draw zone", we could
   calculate how many cups are being brewed.
 - [x] By measuring the time from start to finished, we could determine if the
   coffee maker was automatically turned off (there is still coffee!) or
