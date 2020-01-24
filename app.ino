@@ -40,6 +40,8 @@ void setup() {
   WiFi.on();
   /* WiFi.setCredentials("ssid", "password"); */
   Particle.connect();
+
+  Particle.function("setState", setState);
 }
 
 void loop() {
@@ -62,7 +64,7 @@ void loop() {
     state = 2;
     boiler_timer = millis();
     Particle.publish("tsBoilTimer", String(boiler_timer - timer), PUBLIC);
-    cups = (K1 * (boiler_timer - timer) * M1) / 1000.0
+    cups = (K1 * (boiler_timer - timer) * M1) / 1000.0;
     return;
   }
 
@@ -112,6 +114,11 @@ int readMany(String command) {
 
   digitalWrite(LED_PIN, LOW);
   return rms;
+}
+
+int setState(String newState) {
+  state = newState.toInt();
+  return state;
 }
 
 /* event handlers -------------------- */
