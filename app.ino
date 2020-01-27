@@ -1,6 +1,6 @@
 #include "math.h"
-#define READ_PIN A0
-#define GROUND_PIN A1
+#define READ_PIN A5
+#define GROUND_PIN A4
 #define LED_PIN D7
 
 #define NBR_OF_READINGS 500
