@@ -11,8 +11,8 @@
 #define MIDDLE_TRESHOLD 200
 #define LOWER_TRESHOLD 30
 
-#define K1 36.5
-#define M1 -500
+#define K1 0.03650164
+#define M1 -0.49918924
 #define K2 34000
 #define M2 11600
 
@@ -64,7 +64,7 @@ void loop() {
     state = 2;
     boiler_timer = millis();
     Particle.publish("tsBoilTimer", String(boiler_timer - timer), PUBLIC);
-    cups = (K1 * (boiler_timer - timer) * M1) / 1000.0;
+    cups = K1 * (boiler_timer - timer) / 1000.0 + M1;
     return;
   }
 
@@ -129,8 +129,7 @@ void started() {
 }
 
 void done() {
-  Particle.publish("done", "Coffee is served! :coffee:", PUBLIC);
-  Particle.publish("cups", String(round(cups)), PUBLIC);
+  Particle.publish("done", String((int) round(cups)) + " cups of coffee served! :coffee:", PUBLIC);
   return;
 }
 
