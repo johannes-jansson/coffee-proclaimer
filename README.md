@@ -9,6 +9,9 @@ something like this for a typical brew:
 
 ![current graph](current_graph.png)
 
+> Update! It actually looks like this!
+> ![current graph real](current_graph_real.png)
+
 While the brewer is boiling the water the current draw should be at it's peak.
 After the water has been boiled there should still be some current draw for the
 heated pad, at this plateau we know that there is fresh coffee in the pot. When
