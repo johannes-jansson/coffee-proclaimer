@@ -100,6 +100,7 @@ m2 = 11600
 - [ ] Make messages more dynamic using random, time and date. 
 - [ ] Handle odd state transitions (turning on the heat pad again, cancelling
   during boiling, etc).
+- [ ] Keep track of number of cups per day/week, and generate reports to Slack. 
 
 ## Creds
 
