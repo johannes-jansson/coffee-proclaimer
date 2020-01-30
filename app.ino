@@ -22,8 +22,6 @@
 
 #define THINGSPEAK HIGH
 
-SYSTEM_MODE(SEMI_AUTOMATIC);
-
 int state = 0;
 int positiveReadings[NBR_OF_READINGS];
 unsigned long timer;
@@ -36,10 +34,6 @@ void setup() {
   pinMode(GROUND_PIN, INPUT);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
-
-  WiFi.on();
-  /* WiFi.setCredentials("ssid", "password"); */
-  Particle.connect();
 
   Particle.function("setState", setState);
 }
