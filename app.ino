@@ -47,10 +47,6 @@ void setup() {
 void loop() {
   int reading = readMany("");
 
-  if (THINGSPEAK) {
-    Particle.publish("tsReading", String(reading));
-  }
-
   // check if boiling has started
   if (state == 0 && reading > UPPER_TRESHOLD) {
     state = 1;
