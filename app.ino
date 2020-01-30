@@ -37,6 +37,7 @@ void setup() {
   digitalWrite(LED_PIN, LOW);
   Particle.function("setState", setState);
   Particle.function("getCups", getCups);
+  Particle.function("setCups", setCups);
 }
 
 void loop() {
@@ -73,7 +74,6 @@ void loop() {
   if (state != 0 && reading < LOWER_TRESHOLD) {
     state = 0;
     elapsed = millis() - timer;
-    Particle.publish("tsHeatTimer", String(elapsed), PUBLIC);
     finished(elapsed);
     return;
   }
@@ -121,6 +121,11 @@ int getCups(String s) {
   return nbrOfCups;
 }
 
+int setCups(String newCups) {
+  nbrOfCups = newCups.toInt();
+  return nbrOfCups;
+}
+
 /* event handlers -------------------- */
 
 void started() {
@@ -130,7 +135,7 @@ void started() {
 
 void done() {
   nbrOfCups += (int) round(cups);
-  Particle.publish("done", String((int) round(cups)) + " cups of coffee served! :coffee:", PUBLIC);
+  Particle.publish("done", String((int) round(cups)) + " cups of coffee served! :coffee:\nThat's " + String(nbrOfCups) + " in total today.", PUBLIC);
   return;
 }
 
