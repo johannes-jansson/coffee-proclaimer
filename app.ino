@@ -34,7 +34,6 @@ void setup() {
   pinMode(GROUND_PIN, INPUT);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
-
   Particle.function("setState", setState);
 }
 
@@ -75,6 +74,11 @@ void loop() {
     Particle.publish("tsHeatTimer", String(elapsed), PUBLIC);
     finished(elapsed);
     return;
+  }
+
+  // If it's 3 AM and the device has been running for more than 23 hours
+  if (Time.hour() == 3 && millis() > 23 * 60 * 60 * 1000) {
+    System.reset();
   }
 
   delay(LOOP_DELAY);
