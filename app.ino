@@ -129,21 +129,29 @@ int setCups(String newCups) {
 /* event handlers -------------------- */
 
 void started() {
-  Particle.publish("started", "Coffee is on it's way! Sit tight! :rocket:", PUBLIC);
+  Particle.publish("slack", "Coffee is on it's way! Sit tight! :rocket:", PUBLIC);
   return;
 }
 
 void done() {
   nbrOfCups += (int) round(cups);
-  Particle.publish("done", String((int) round(cups)) + " cups of coffee served! :coffee:\nThat's " + String(nbrOfCups) + " in total today.", PUBLIC);
+  Particle.publish("slack", String((int) round(cups)) + " cups of coffee served! :coffee:\nThat's " + String(nbrOfCups) + " in total today.", PUBLIC);
+
+  // Trying out some stuff
+  // If it's friday
+  if (Time.weekday() == 6) {
+    Particle.publish("slack_dev", String((int) round(cups)) + " cups of coffee served! :coffee_parrot:\nThat's " + String(nbrOfCups) + " in total today.", PUBLIC);
+  } else {
+    Particle.publish("slack_dev", String((int) round(cups)) + " cups of coffee served! :coffee:\nThat's " + String(nbrOfCups) + " in total today.", PUBLIC);
+  }
   return;
 }
 
 void finished(int elapsed) {
   if (elapsed >= AUTO_TURNOFF_TIME) {
-    Particle.publish("finished", "The coffee is getting cold, hurry! :snowflake:", PUBLIC);
+    Particle.publish("slack", "The coffee is getting cold, hurry! :snowflake:", PUBLIC);
   } else {
-    Particle.publish("finished", "No more coffee :frowning:", PUBLIC);
+    Particle.publish("slack", "No more coffee :frowning:", PUBLIC);
   }
   return;
 }
