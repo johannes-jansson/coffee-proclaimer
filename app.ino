@@ -25,9 +25,10 @@
 int state = 0;
 int positiveReadings[NBR_OF_READINGS];
 unsigned long timer;
-unsigned long boiler_timer;
+unsigned long boilerTimer;
 int elapsed;
 float cups = -1;
+int nbrOfCups = 0;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -35,6 +36,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
   Particle.function("setState", setState);
+  Particle.function("getCups", getCups);
 }
 
 void loop() {
@@ -51,9 +53,9 @@ void loop() {
   // check if boiling has finished and heating has started
   if (state == 1 && reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD) {
     state = 2;
-    boiler_timer = millis();
-    Particle.publish("tsBoilTimer", String(boiler_timer - timer), PUBLIC);
-    cups = K1 * (boiler_timer - timer) / 1000.0 + M1;
+    boilerTimer = millis();
+    Particle.publish("tsBoilTimer", String(boilerTimer - timer), PUBLIC);
+    cups = K1 * (boilerTimer - timer) / 1000.0 + M1;
     return;
   }
 
@@ -61,7 +63,7 @@ void loop() {
   if (
     state == 2 &&
     reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD &&
-    millis() - boiler_timer > DRIP_DELAY
+    millis() - boilerTimer > DRIP_DELAY
   ) {
     state = 3;
     done();
@@ -115,6 +117,10 @@ int setState(String newState) {
   return state;
 }
 
+int getCups(String s) {
+  return nbrOfCups;
+}
+
 /* event handlers -------------------- */
 
 void started() {
@@ -123,6 +129,7 @@ void started() {
 }
 
 void done() {
+  nbrOfCups += (int) round(cups);
   Particle.publish("done", String((int) round(cups)) + " cups of coffee served! :coffee:", PUBLIC);
   return;
 }
