@@ -78,6 +78,7 @@ void loop() {
 
   // If it's 3 AM and the device has been running for more than 23 hours
   if (Time.hour() == 3 && millis() > 23 * 60 * 60 * 1000) {
+    Particle.publish("dev_slack", Time.timeStr() + ", I'm resetting", PUBLIC);
     System.reset();
   }
 
@@ -129,21 +130,46 @@ int setCups(String newCups) {
 /* event handlers -------------------- */
 
 void started() {
-  Particle.publish("slack", "Coffee is on it's way! Sit tight! :rocket:", PUBLIC);
+  bool first = nbrOfCups == 0;
+  String outstring = "";
+  if (Time.hour() < 8 && first) outstring += "Good morning <@UJ67H58GG|gordon>!\n";
+  else if (Time.hour() < 10 && first) outstring += "Good morning!\n";
+  outstring += "Coffee is on it's way! Sit tight! :rocket:";
+
+  Particle.publish("slack", outstring, PUBLIC);
   return;
 }
 
 void done() {
+  bool first = nbrOfCups == 0;
   nbrOfCups += (int) round(cups);
-  Particle.publish("slack", String((int) round(cups)) + " cups of coffee served! :coffee:\nThat's " + String(nbrOfCups) + " in total today.", PUBLIC);
+  String outstring = "";
 
-  // Trying out some stuff
-  // If it's friday
-  if (Time.weekday() == 6) {
-    Particle.publish("slack_dev", String((int) round(cups)) + " cups of coffee served! :coffee_parrot:\nThat's " + String(nbrOfCups) + " in total today.", PUBLIC);
-  } else {
-    Particle.publish("slack_dev", String((int) round(cups)) + " cups of coffee served! :coffee:\nThat's " + String(nbrOfCups) + " in total today.", PUBLIC);
+  // Always present number of coffee cups served
+  outstring += String((int) round(cups)) + " cups of coffee served! ";
+
+  // Random emoji means awesome emoji!
+  int r = random(50);
+  if (Time.weekday() == 6) outstring += ":coffee_parrot:";
+  else if (r == 0) outstring += ":aw_yeah:";
+  else if (r == 1) outstring += ":carlton:";
+  else if (r == 2) outstring += ":thumbsup_all:";
+  else if (r == 3) outstring += ":the_horns:";
+  else if (r == 4) outstring += ":raised_hands:";
+  else outstring += ":coffee:";
+  
+  // Give the people what the people want: fun stats!
+  outstring += "\nThat's " + String(nbrOfCups) + " in total today.";
+
+  // Optional comment based on coffee amount
+  if (nbrOfCups > 60 && random(2) == 0) {
+    outstring += " Pretty impressive!";
+  } else if (nbrOfCups < 21 && !first && Time.hour() > 10 && random(2) == 0) {
+    outstring += " Those are rookie numbers!";
   }
+
+  Particle.publish("slack", outstring, PUBLIC);
+  Particle.publish("dev_slack", outstring, PUBLIC);
   return;
 }
 

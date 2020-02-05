@@ -89,18 +89,18 @@ m2 = 11600
 ## Future improvements
 
 - [x] Introduce a delay after "finished" boiling, to let the coffee run down.
-- [ ] Based on number of cups, we should calculate how long the delay above
+- [x] Based on number of cups, we should calculate how long the delay above
   will be. 
 - [x] By measuring the time spent in the "high current draw zone", we could
   calculate how many cups are being brewed.
 - [x] By measuring the time from start to finished, we could determine if the
   coffee maker was automatically turned off (there is still coffee!) or
   if somebody turned it off ahead of time (there is no more coffee).
-- [ ] Device should restart every night, to keep timers sane and re-sync time.
-- [ ] Make messages more dynamic using random, time and date. 
+- [x] Device should restart every night, to keep timers sane and re-sync time.
+- [x] Make messages more dynamic using random, time and date. 
 - [ ] Handle odd state transitions (turning on the heat pad again, cancelling
   during boiling, etc).
-- [ ] Keep track of number of cups per day/week, and generate reports to Slack. 
+- [x] Keep track of number of cups per day/week, and generate reports to Slack. 
 
 ## Creds
 
