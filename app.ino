@@ -13,14 +13,10 @@
 
 #define K1 0.03650164
 #define M1 -0.49918924
-#define K2 34000
-#define M2 11600
+#define K2 11.6600
+#define M2 34
 
 #define AUTO_TURNOFF_TIME 29 * 60 * 1000
-#define BOIL_DELAY 300 * 1000
-#define DRIP_DELAY 150 * 1000
-
-#define THINGSPEAK HIGH
 
 int state = 0;
 int positiveReadings[NBR_OF_READINGS];
@@ -29,6 +25,7 @@ unsigned long boilerTimer;
 int elapsed;
 float cups = -1;
 int nbrOfCups = 0;
+int dripDelay = 0;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -57,6 +54,7 @@ void loop() {
     boilerTimer = millis();
     Particle.publish("tsBoilTimer", String(boilerTimer - timer), PUBLIC);
     cups = K1 * (boilerTimer - timer) / 1000.0 + M1;
+    dripDelay = (K2 * cups + M2) * 1000;
     return;
   }
 
@@ -64,7 +62,7 @@ void loop() {
   if (
     state == 2 &&
     reading < MIDDLE_TRESHOLD && reading > LOWER_TRESHOLD &&
-    millis() - boilerTimer > DRIP_DELAY
+    millis() - boilerTimer > dripDelay
   ) {
     state = 3;
     done();
@@ -111,6 +109,8 @@ int readMany(String command) {
   digitalWrite(LED_PIN, LOW);
   return rms;
 }
+
+/* cloud functions -------------------- */
 
 int setState(String newState) {
   state = newState.toInt();
