@@ -18,6 +18,8 @@
 
 #define AUTO_TURNOFF_TIME 29 * 60 * 1000
 
+SYSTEM_MODE(SEMI_AUTOMATIC);
+
 int state = 0;
 int positiveReadings[NBR_OF_READINGS];
 unsigned long timer;
@@ -32,6 +34,9 @@ void setup() {
   pinMode(GROUND_PIN, INPUT);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
+  WiFi.on();
+  WiFi.connect();
+  Particle.connect();
   Particle.function("setState", setState);
   Particle.function("getCups", getCups);
   Particle.function("setCups", setCups);
@@ -74,6 +79,13 @@ void loop() {
     elapsed = millis() - timer;
     finished(elapsed);
     return;
+  }
+
+  // Make sure we have wifi connection
+  if (!Particle.connected()) Particle.connect();
+  if (!WiFi.ready()) {
+    WiFi.on();
+    WiFi.connect();
   }
 
   // If it's 3 AM and the device has been running for more than 23 hours
