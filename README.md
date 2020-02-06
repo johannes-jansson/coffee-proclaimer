@@ -28,6 +28,11 @@ cable to the coffee maker. This is hooked up to a wifi-connected
 microcontroller, which will post to the Slack API using webhooks. 
 
 
+## Contributing
+
+Please contribute! Make a pull request against the `develop` branch. Custom messages (low hanging fruit 🍒) are handled in the functions `started`, `done` and `finished`, last in `app.ino`. 
+
+
 ## Parts list
 
 - Particle photon
@@ -40,6 +45,7 @@ microcontroller, which will post to the Slack API using webhooks.
 - (Power supply)
 
 ![breadboard](breadboard.png)
+
 
 ## Electrical math
 
@@ -101,6 +107,7 @@ m2 = 11600
 - [ ] Handle odd state transitions (turning on the heat pad again, cancelling
   during boiling, etc).
 - [x] Keep track of number of cups per day/week, and generate reports to Slack. 
+
 
 ## Creds
 
