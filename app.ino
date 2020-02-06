@@ -146,7 +146,7 @@ void started() {
   String outstring = "";
   if (Time.hour() < 8 && first) outstring += "Good morning <@UJ67H58GG|gordon>!\n";
   else if (Time.hour() < 10 && first) outstring += "Good morning!\n";
-  outstring += "Coffee is on it's way! Sit tight! :rocket:";
+  outstring += "Brain juice is on it's way! Sit tight! :rocket:";
 
   Particle.publish("slack", outstring, PUBLIC);
   return;
@@ -158,7 +158,7 @@ void done() {
   String outstring = "";
 
   // Always present number of coffee cups served
-  outstring += String((int) round(cups)) + " cups of coffee served! ";
+  outstring += String((int) round(cups)) + " cups of brain juice served! ";
 
   // Random emoji means awesome emoji!
   int r = random(50);
@@ -187,9 +187,9 @@ void done() {
 
 void finished(int elapsed) {
   if (elapsed >= AUTO_TURNOFF_TIME) {
-    Particle.publish("slack", "The coffee is getting cold, hurry! :snowflake:", PUBLIC);
+    Particle.publish("slack", "The brain juice is getting cold, hurry! :snowflake:", PUBLIC);
   } else {
-    Particle.publish("slack", "No more coffee :frowning:", PUBLIC);
+    Particle.publish("slack", "No more brain juice :frowning:", PUBLIC);
   }
   return;
 }
