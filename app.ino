@@ -28,6 +28,7 @@ int elapsed;
 float cups = -1;
 int nbrOfCups = 0;
 int dripDelay = 0;
+int maxRandomNumber = 100;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -146,50 +147,130 @@ void started() {
   String outstring = "";
   if (Time.hour() < 8 && first) outstring += "Good morning <@UJ67H58GG|gordon>!\n";
   else if (Time.hour() < 10 && first) outstring += "Good morning!\n";
-  outstring += "Brain juice is on it's way! Sit tight! :rocket:";
+  outstring += "Coffee is on it's way! Sit tight! :rocket:";
 
-  Particle.publish("slack", outstring, PUBLIC);
+  proclaimCoffeeInSlack(outstring);
   return;
 }
 
+void proclaimCoffeeInSlack(message) {
+  Particle.publish("slack", message, PUBLIC);
+}
+
 void done() {
-  bool first = nbrOfCups == 0;
+  bool firstCupsOfTheDay = nbrOfCups == 0;
   nbrOfCups += (int) round(cups);
-  String outstring = "";
 
-  // Always present number of coffee cups served
-  outstring += String((int) round(cups)) + " cups of brain juice served! ";
+  String coffeeDoneMessage = coffeeDoneMessageCompiler(firstCupsOfTheDay, nbrOfCups, cups);
 
-  // Random emoji means awesome emoji!
-  int r = random(50);
-  if (Time.weekday() == 6) outstring += ":coffee_parrot:";
-  else if (r == 0) outstring += ":aw_yeah:";
-  else if (r == 1) outstring += ":carlton:";
-  else if (r == 2) outstring += ":thumbsup_all:";
-  else if (r == 3) outstring += ":the_horns:";
-  else if (r == 4) outstring += ":raised_hands:";
-  else outstring += ":coffee:";
-  
-  // Give the people what the people want: fun stats!
-  outstring += "\nThat's " + String(nbrOfCups) + " in total today.";
+  proclaimCoffeeInSlack(coffeeDoneMessage)
+  Particle.publish("dev_slack", coffeeDoneMessage, PUBLIC);
+  return;
+}
 
-  // Optional comment based on coffee amount
-  if (nbrOfCups > 60 && random(2) == 0) {
-    outstring += " Pretty impressive!";
-  } else if (nbrOfCups < 21 && !first && Time.hour() > 10 && random(2) == 0) {
-    outstring += " Those are rookie numbers!";
+String coffeeDoneMessageCompiler(bool firstCupsOfTheDay, int totalNumberOfCups, int servedCups) {
+  return coffeeDoneNumberOfCupsServedCompiler(servedCups) + coffeeDoneStatisticsMessageCompiler(totalNumberOfCups,firstCupsOfTheDay);
+}
+
+String coffeeDoneNumberOfCupsServedCompiler(int servedCups) {
+  String optionalMessage = ""
+
+  if (random(maxRandomNumber) == maxRandomNumber) {
+    message = "EXTERMINAT... \n FORCE SYSTEM REBOOT... \n... \n "
   }
 
-  Particle.publish("slack", outstring, PUBLIC);
-  Particle.publish("dev_slack", outstring, PUBLIC);
-  return;
+  return optionalMessage + String((int) round(servedCups)) + " cups of coffee served! " + coffeeDoneNumberOfCupsServedExtraMessage(servedCups);
+}
+
+String coffeeDoneNumberOfCupsServedExtraMessage(servedCups) {
+  String randomEmoji;
+
+  if (servedCups > 4) {
+    randomEmoji = positiveExtraMessage() + positiveRandomEmoji();
+  } else {
+    randomEmoji = questioningExtraMessage() + questioningRandomEmoji();
+  }
+
+  return randomEmoji;
+}
+
+String positiveExtraMessage() {
+  String positiveExtraMessage;
+
+  int r = random(maxRandomNumber);
+  else if (r == 0) positiveExtraMessage = " Coffee 'o clock y'all! '";
+  else positiveExtraMessage = " everything is coming together ";
+
+  return positiveExtraMessage;
+}
+
+String positiveRandomEmoji() {
+  String positiveRandomEmoji;
+
+  int r = random(maxRandomNumber);
+  if (Time.weekday() == 6) positiveRandomEmoji = ":coffee_parrot:";
+  else if (r == 0) positiveRandomEmoji = ":aw_yeah:";
+  else if (r == 1) positiveRandomEmoji = ":carlton:";
+  else if (r == 2) positiveRandomEmoji = ":thumbsup_all:";
+  else if (r == 3) positiveRandomEmoji = ":the_horns:";
+  else if (r == 4) positiveRandomEmoji = ":raised_hands:";
+  else if (r == 5) positiveRandomEmoji = ":aw_yeah:";
+  else if (r == 6) positiveRandomEmoji = ":carlton:";
+  else if (r == 7) positiveRandomEmoji = ":parrot:";
+  else if (r == 8) positiveRandomEmoji = ":star_struck:";
+  else if (r == 9) positiveRandomEmoji = ":blue_heart:";
+  else positiveRandomEmoji = ":coffee:";
+
+  return positiveRandomEmoji;
+}
+
+String questioningExtraMessage() {
+  String questioningExtraMessage;
+
+  if (Time.weekday() == 6) questioningExtraMessage = " good that the weekend is near ";
+  else questioningExtraMessage = " quick, get to the coffee machine! ";
+
+  return questioningExtraMessage;
+}
+
+String questioningRandomEmoji() {
+  String questioningRandomEmoji;
+
+  int r = random(maxRandomNumber);
+  if (Time.weekday() == 6) questioningRandomEmoji = ":persevere:";
+  else if (r == 0) questioningRandomEmoji = ":white_frowning_face:";
+  else if (r == 1) questioningRandomEmoji = ":face_with_rolling_eyes:";
+  else if (r == 2) questioningRandomEmoji = ":cry:";
+  else if (r == 3) questioningRandomEmoji = ":sweat:";
+  else if (r == 4) questioningRandomEmoji = ":tired_face:";
+  else if (r == 5) questioningRandomEmoji = ":unamused:";
+  else if (r == 6) questioningRandomEmoji = ":confused:";
+  else if (r == 7) questioningRandomEmoji = ":worried:";
+  else if (r == 8) questioningRandomEmoji = ":open_mouth:";
+  else if (r == 9) questioningRandomEmoji = ":face_with_monocle:";
+  else questioningRandomEmoji = ":sleeping:";
+
+  return questioningRandomEmoji;
+}
+
+String coffeeDoneStatisticsMessageCompiler(int totalNumberOfCups, bool firstCupsOfTheDay) {
+  String extraMessage = "\nThat's " + String(totalNumberOfCups) + " in total today.";
+
+  // Optional comment based on coffee amount
+  if (totalNumberOfCups > 60 && random(2) == 0) {
+    extraMessage += " Pretty impressive!";
+  } else if (totalNumberOfCups < 21 && !firstCupsOfTheDay && Time.hour() > 10 && random(2) == 0) {
+    extraMessage += " Those are rookie numbers!";
+  }
+
+  return extraMessage;
 }
 
 void finished(int elapsed) {
   if (elapsed >= AUTO_TURNOFF_TIME) {
-    Particle.publish("slack", "The brain juice is getting cold, hurry! :snowflake:", PUBLIC);
+    proclaimCoffeeInSlack("The coffee is getting cold, hurry! :snowflake:")
   } else {
-    Particle.publish("slack", "No more brain juice :frowning:", PUBLIC);
+    proclaimCoffeeInSlack("No more coffee :frowning:")
   }
   return;
 }
