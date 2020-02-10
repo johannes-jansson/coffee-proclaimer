@@ -153,7 +153,7 @@ void started() {
   return;
 }
 
-void proclaimCoffeeInSlack(message) {
+void proclaimCoffeeInSlack(String message) {
   Particle.publish("slack", message, PUBLIC);
 }
 
@@ -182,7 +182,7 @@ String coffeeDoneNumberOfCupsServedCompiler(int servedCups) {
   return optionalMessage + String((int) round(servedCups)) + " cups of coffee served! " + coffeeDoneNumberOfCupsServedExtraMessage(servedCups);
 }
 
-String coffeeDoneNumberOfCupsServedExtraMessage(servedCups) {
+String coffeeDoneNumberOfCupsServedExtraMessage(int servedCups) {
   String randomEmoji;
 
   if (servedCups > 4) {
