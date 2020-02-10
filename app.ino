@@ -153,7 +153,7 @@ void started() {
   return;
 }
 
-void proclaimCoffeeInSlack(String message) {
+void proclaimCoffeeInSlack(message) {
   Particle.publish("slack", message, PUBLIC);
 }
 
@@ -163,7 +163,7 @@ void done() {
 
   String coffeeDoneMessage = coffeeDoneMessageCompiler(firstCupsOfTheDay, nbrOfCups, cups);
 
-  proclaimCoffeeInSlack(coffeeDoneMessage)
+  proclaimCoffeeInSlack(coffeeDoneMessage);
   Particle.publish("dev_slack", coffeeDoneMessage, PUBLIC);
   return;
 }
@@ -173,16 +173,16 @@ String coffeeDoneMessageCompiler(bool firstCupsOfTheDay, int totalNumberOfCups, 
 }
 
 String coffeeDoneNumberOfCupsServedCompiler(int servedCups) {
-  String optionalMessage = ""
+  String optionalMessage = "";
 
   if (random(maxRandomNumber) == maxRandomNumber) {
-    message = "EXTERMINAT... \n FORCE SYSTEM REBOOT... \n... \n "
+    optionalMessage = "EXTERMINAT... \n FORCE SYSTEM REBOOT... \n... \n ";
   }
 
   return optionalMessage + String((int) round(servedCups)) + " cups of coffee served! " + coffeeDoneNumberOfCupsServedExtraMessage(servedCups);
 }
 
-String coffeeDoneNumberOfCupsServedExtraMessage(int servedCups) {
+String coffeeDoneNumberOfCupsServedExtraMessage(servedCups) {
   String randomEmoji;
 
   if (servedCups > 4) {
@@ -198,7 +198,7 @@ String positiveExtraMessage() {
   String positiveExtraMessage;
 
   int r = random(maxRandomNumber);
-  else if (r == 0) positiveExtraMessage = " Coffee 'o clock y'all! '";
+  if (r == 0) positiveExtraMessage = " Coffee 'o clock y'all! '";
   else positiveExtraMessage = " everything is coming together ";
 
   return positiveExtraMessage;
@@ -207,7 +207,7 @@ String positiveExtraMessage() {
 String positiveRandomEmoji() {
   String positiveRandomEmoji;
 
-  int r = random(maxRandomNumber);
+  int r = random(20);
   if (Time.weekday() == 6) positiveRandomEmoji = ":coffee_parrot:";
   else if (r == 0) positiveRandomEmoji = ":aw_yeah:";
   else if (r == 1) positiveRandomEmoji = ":carlton:";
@@ -236,7 +236,7 @@ String questioningExtraMessage() {
 String questioningRandomEmoji() {
   String questioningRandomEmoji;
 
-  int r = random(maxRandomNumber);
+  int r = random(20);
   if (Time.weekday() == 6) questioningRandomEmoji = ":persevere:";
   else if (r == 0) questioningRandomEmoji = ":white_frowning_face:";
   else if (r == 1) questioningRandomEmoji = ":face_with_rolling_eyes:";
@@ -268,9 +268,9 @@ String coffeeDoneStatisticsMessageCompiler(int totalNumberOfCups, bool firstCups
 
 void finished(int elapsed) {
   if (elapsed >= AUTO_TURNOFF_TIME) {
-    proclaimCoffeeInSlack("The coffee is getting cold, hurry! :snowflake:")
+    proclaimCoffeeInSlack("The coffee is getting cold, hurry! :snowflake:");
   } else {
-    proclaimCoffeeInSlack("No more coffee :frowning:")
+    proclaimCoffeeInSlack("No more coffee :frowning:");
   }
   return;
 }
