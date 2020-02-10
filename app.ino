@@ -89,8 +89,8 @@ void loop() {
     WiFi.connect();
   }
 
-  // If it's 3 AM and the device has been running for more than 23 hours
-  if (Time.hour() == 3 && millis() > 23 * 60 * 60 * 1000) {
+  // If it's 3 AM and the device has been running for more than an hour
+  if (Time.hour() == 3 && millis() > 60 * 60 * 1000) {
     Particle.publish("dev_slack", Time.timeStr() + ", I'm resetting", PUBLIC);
     System.reset();
   }
