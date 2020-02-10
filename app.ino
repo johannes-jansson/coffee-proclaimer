@@ -176,7 +176,7 @@ String coffeeDoneNumberOfCupsServedCompiler(int servedCups) {
   String optionalMessage = "";
 
   if (random(maxRandomNumber) == maxRandomNumber) {
-    optionalMessage = "EXTERMINAT... \n FORCE SYSTEM REBOOT... \n... \n ";
+    optionalMessage = "EXTERMINAT... \n FORCE SYSTEM REBOOT... \n... \n";
   }
 
   return optionalMessage + String((int) round(servedCups)) + " cups of coffee served! " + coffeeDoneNumberOfCupsServedExtraMessage(servedCups);
@@ -198,8 +198,8 @@ String positiveExtraMessage() {
   String positiveExtraMessage;
 
   int r = random(maxRandomNumber);
-  if (r == 0) positiveExtraMessage = " Coffee 'o clock y'all! '";
-  else positiveExtraMessage = " everything is coming together ";
+  if (r == 0) positiveExtraMessage = "Coffee 'o clock y'all! '";
+  else positiveExtraMessage = "Everything is coming together ";
 
   return positiveExtraMessage;
 }
@@ -227,8 +227,8 @@ String positiveRandomEmoji() {
 String questioningExtraMessage() {
   String questioningExtraMessage;
 
-  if (Time.weekday() == 6) questioningExtraMessage = " good that the weekend is near ";
-  else questioningExtraMessage = " quick, get to the coffee machine! ";
+  if (Time.weekday() == 6) questioningExtraMessage = "Good that the weekend is near ";
+  else questioningExtraMessage = "Quick, get to the coffee machine! ";
 
   return questioningExtraMessage;
 }
