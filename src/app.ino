@@ -30,7 +30,7 @@ float cups = -1;
 int nbrOfCups = 0;
 int dripDelay = 0;
 int maxRandomNumber = 100;
-Coffeemessages msg;
+Coffeemessages msgs;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -43,7 +43,6 @@ void setup() {
   Particle.function("setState", setState);
   Particle.function("getCups", getCups);
   Particle.function("setCups", setCups);
-  Particle.function("test", test);
 }
 
 void loop() {
@@ -143,11 +142,6 @@ int setCups(String newCups) {
   return nbrOfCups;
 }
 
-int test(String message) {
-  msg.proclaim("test from coffee-messages.cpp");
-  return 1;
-}
-
 /* event handlers -------------------- */
 
 void started() {
@@ -157,12 +151,8 @@ void started() {
   else if (Time.hour() < 10 && first) outstring += "Good morning!\n";
   outstring += "Coffee is on it's way! Sit tight! :rocket:";
 
-  proclaimCoffeeInSlack(outstring);
+  msgs.proclaim(outstring);
   return;
-}
-
-void proclaimCoffeeInSlack(String message) {
-  Particle.publish("slack", message, PUBLIC);
 }
 
 void done() {
@@ -171,8 +161,7 @@ void done() {
 
   String coffeeDoneMessage = coffeeDoneMessageCompiler(firstCupsOfTheDay, nbrOfCups, cups);
 
-  proclaimCoffeeInSlack(coffeeDoneMessage);
-  Particle.publish("dev_slack", coffeeDoneMessage, PUBLIC);
+  msgs.proclaim(coffeeDoneMessage);
   return;
 }
 
@@ -276,9 +265,9 @@ String coffeeDoneStatisticsMessageCompiler(int totalNumberOfCups, bool firstCups
 
 void finished(int elapsed) {
   if (elapsed >= AUTO_TURNOFF_TIME) {
-    proclaimCoffeeInSlack("The coffee is getting cold, hurry! :snowflake:");
+    msgs.proclaim("The coffee is getting cold, hurry! :snowflake:");
   } else {
-    proclaimCoffeeInSlack("No more coffee :frowning:");
+    msgs.proclaim("No more coffee :frowning:");
   }
   return;
 }

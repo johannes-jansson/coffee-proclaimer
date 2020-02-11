@@ -4,7 +4,7 @@ Coffeemessages::Coffeemessages() {
 }
 
 void Coffeemessages::proclaim(String message) {
-    Particle.publish("dev_slack", message, PUBLIC);
+    Particle.publish("slack", message, PUBLIC);
 }
 
 // Example private method
