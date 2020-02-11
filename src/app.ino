@@ -1,4 +1,5 @@
 #include "math.h"
+#include "./src/coffee-messages.h"
 #define READ_PIN A5
 #define GROUND_PIN A4
 #define LED_PIN D7
@@ -29,6 +30,7 @@ float cups = -1;
 int nbrOfCups = 0;
 int dripDelay = 0;
 int maxRandomNumber = 100;
+Coffeemessages msg;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -41,6 +43,7 @@ void setup() {
   Particle.function("setState", setState);
   Particle.function("getCups", getCups);
   Particle.function("setCups", setCups);
+  Particle.function("test", test);
 }
 
 void loop() {
@@ -138,6 +141,11 @@ int getCups(String s) {
 int setCups(String newCups) {
   nbrOfCups = newCups.toInt();
   return nbrOfCups;
+}
+
+int test(String message) {
+  msg.proclaim("test from coffee-messages.cpp");
+  return 1;
 }
 
 /* event handlers -------------------- */
