@@ -1,4 +1,5 @@
 #include "math.h"
+#include "./src/coffee-messages.h"
 #define READ_PIN A5
 #define GROUND_PIN A4
 #define LED_PIN D7
@@ -29,6 +30,7 @@ float cups = -1;
 int nbrOfCups = 0;
 int dripDelay = 0;
 int maxRandomNumber = 100;
+Coffeemessages msgs;
 
 void setup() {
   pinMode(READ_PIN, INPUT);
@@ -149,12 +151,8 @@ void started() {
   else if (Time.hour() < 10 && first) outstring += "Good morning!\n";
   outstring += "Coffee is on it's way! Sit tight! :rocket:";
 
-  proclaimCoffeeInSlack(outstring);
+  msgs.proclaim(outstring);
   return;
-}
-
-void proclaimCoffeeInSlack(String message) {
-  Particle.publish("slack", message, PUBLIC);
 }
 
 void done() {
@@ -163,8 +161,7 @@ void done() {
 
   String coffeeDoneMessage = coffeeDoneMessageCompiler(firstCupsOfTheDay, nbrOfCups, cups);
 
-  proclaimCoffeeInSlack(coffeeDoneMessage);
-  Particle.publish("dev_slack", coffeeDoneMessage, PUBLIC);
+  msgs.proclaim(coffeeDoneMessage);
   return;
 }
 
@@ -268,9 +265,9 @@ String coffeeDoneStatisticsMessageCompiler(int totalNumberOfCups, bool firstCups
 
 void finished(int elapsed) {
   if (elapsed >= AUTO_TURNOFF_TIME) {
-    proclaimCoffeeInSlack("The coffee is getting cold, hurry! :snowflake:");
+    msgs.proclaim("The coffee is getting cold, hurry! :snowflake:");
   } else {
-    proclaimCoffeeInSlack("No more coffee :frowning:");
+    msgs.proclaim("No more coffee :frowning:");
   }
   return;
 }
