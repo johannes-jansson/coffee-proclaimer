@@ -159,7 +159,7 @@ void done() {
   bool firstCupsOfTheDay = nbrOfCups == 0;
   nbrOfCups += (int) round(cups);
 
-  String coffeeDoneMessage = coffeeDoneMessageCompiler(firstCupsOfTheDay, nbrOfCups, cups);
+  String coffeeDoneMessage = coffeeDoneMessageCompiler(firstCupsOfTheDay, nbrOfCups, (int) round(cups));
 
   msgs.proclaim(coffeeDoneMessage);
   return;
