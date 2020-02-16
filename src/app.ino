@@ -214,7 +214,7 @@ String positiveRandomEmoji() {
   else if (r == 5) positiveRandomEmoji = ":aw_yeah:";
   else if (r == 6) positiveRandomEmoji = ":carlton:";
   else if (r == 7) positiveRandomEmoji = ":parrot:";
-  else if (r == 8) positiveRandomEmoji = ":star_struck:";
+  else if (r == 8) positiveRandomEmoji = ":star-struck:";
   else if (r == 9) positiveRandomEmoji = ":blue_heart:";
   else positiveRandomEmoji = ":coffee:";
 
