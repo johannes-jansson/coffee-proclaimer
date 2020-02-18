@@ -147,8 +147,7 @@ int setCups(String newCups) {
 void started() {
   bool first = nbrOfCups == 0;
   String outstring = "";
-  if (Time.hour() < 8 && first) outstring += "Good morning <@UJ67H58GG|gordon>!\n";
-  else if (Time.hour() < 10 && first) outstring += "Good morning!\n";
+  if (Time.hour() < 10 && first) outstring += "Good morning!\n";
   outstring += "Coffee is on it's way! Sit tight! :rocket:";
 
   msgs.proclaim(outstring);
