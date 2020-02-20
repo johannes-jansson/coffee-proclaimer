@@ -156,9 +156,12 @@ void started() {
 
 void done() {
   bool firstCupsOfTheDay = nbrOfCups == 0;
-  nbrOfCups += (int) round(cups);
+  int freshCups = (int) round(cups);
+  nbrOfCups += freshCups;
+  // The following line publishes number of cups to our data api
+  Particle.publish("cups", String(freshCups), PUBLIC);
 
-  String coffeeDoneMessage = coffeeDoneMessageCompiler(firstCupsOfTheDay, nbrOfCups, (int) round(cups));
+  String coffeeDoneMessage = coffeeDoneMessageCompiler(firstCupsOfTheDay, nbrOfCups, freshCups);
 
   msgs.proclaim(coffeeDoneMessage);
   return;
